@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dinámicas Isha</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f7f1e9;color:#49372c;font-family:Arial,sans-serif}
+header{background:#654432;color:white;text-align:center;padding:30px 15px}
+header h1{font-family:Georgia,serif;font-size:34px;margin:0}
+header p{margin-bottom:0}
+main{max-width:700px;margin:25px auto;padding:15px}
+.card{background:white;border-radius:16px;padding:20px;margin-bottom:18px;box-shadow:0 4px 15px #00000010}
+h2{color:#79533d;margin-top:0}
+.premio{text-align:center;background:#eee3d6;padding:18px;border-radius:12px}
+.precio{font-size:27px;font-weight:bold;color:#79533d}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}
+.num{padding:13px 2px;border:1px solid #cdb9a6;border-radius:8px;background:#fffaf5;color:#49372c;font-weight:bold}
+.num.sel{background:#79533d;color:white}
+.num.ocupado{background:#ddd;color:#888;text-decoration:line-through}
+button{border:0;border-radius:9px;padding:13px 16px;background:#79533d;color:white;font-weight:bold;cursor:pointer}
+button.sec{background:#e9ded2;color:#49372c}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+input{width:100%;padding:13px;border:1px solid #cdb9a6;border-radius:8px;margin:6px 0 13px;font-size:16px}
+small{color:#806e60}
+#mensaje{margin-top:12px;font-weight:bold}
+footer{text-align:center;padding:25px;color:#806e60}
+</style>
+</head>
+<body>
+<header>
+<h1>Dinámicas Isha</h1>
+<p>¡Participá y llevate increíbles premios!</p>
+</header>
+<main>
+<section class="card">
+<h2>Bienvenidos</h2>
+<p>Elegí tus números favoritos o dejá que el sistema los asigne por vos.</p>
+<div class="premio">
+<p>🎁 PREMIO DE LA DINÁMICA</p>
+<h2>¡Tu próximo premio puede ser tuyo!</h2>
+<div class="precio">$1.000</div>
+<p>por número</p>
+</div>
+</section>
+<section class="card">
+<h2>Elegí tus números</h2>
+<p id="contador">Seleccionados: 0</p>
+<div class="actions">
+<button class="sec" onclick="azar()">🎲 Elegir al azar</button>
+<button class="sec" onclick="limpiar()">Limpiar selección</button>
+</div>
+<div class="grid" id="cartilla"></div>
+<p><small>Beige: disponible · Marrón: seleccionado · Gris: ocupado</small></p>
+</section>
+<section class="card">
+<h2>Datos para participar</h2>
+<form id="formulario">
+<label>Nombre y apellido</label>
+<input id="nombre" required placeholder="Tu nombre completo">
+<label>WhatsApp</label>
+<input id="telefono" required type="tel" placeholder="Tu número de teléfono">
+<label>Localidad</label>
+<input id="localidad" required placeholder="¿De dónde sos?">
+<p><strong id="total">Total: $0</strong></p>
+<button type="submit">Continuar</button>
+<p id="mensaje"></p>
+</form>
+</section>
+</main>
+<footer>Dinámicas Isha · Gracias por participar 🤎</footer>
+<script>
+const cantidad=30;
+const precio=1000;
+let seleccionados=[];
+let ocupados=[];
+const cartilla=document.getElementById('cartilla');
+
+function dibujar(){
+ cartilla.innerHTML='';
+ for(let i=1;i<=cantidad;i++){
+  const b=document.createElement('button');
+  b.textContent=String(i).padStart(2,'0');
+  b.className='num'+(ocupados.includes(i)?' ocupado':seleccionados.includes(i)?' sel':'');
+  b.disabled=ocupados.includes(i);
+  b.onclick=()=>alternar(i);
+  cartilla.appendChild(b);
+ }
+ actualizar();
+}
+function alternar(n){
+ if(seleccionados.includes(n)) seleccionados=seleccionados.filter(x=>x!==n);
+ else seleccionados.push(n);
+ dibujar();
+}
+function azar(){
+ const libres=Array.from({length:cantidad},(_,i)=>i+1).filter(n=>!ocupados.includes(n)&&!seleccionados.includes(n));
+ if(!libres.length)return;
+ const n=libres[Math.floor(Math.random()*libres.length)];
+ seleccionados.push(n);
+ dibujar();
+}
+function limpiar(){seleccionados=[];dibujar();}
+function actualizar(){
+ document.getElementById('contador').textContent='Seleccionados: '+seleccionados.length;
+ document.getElementById('total').textContent='Total: $'+(seleccionados.length*precio).toLocaleString('es-AR');
+}
+document.getElementById('formulario').onsubmit=e=>{
+ e.preventDefault();
+ if(!seleccionados.length){
+  document.getElementById('mensaje').textContent='Primero elegí al menos un número.';
+  return;
+ }
+ document.getElementById('mensaje').textContent=
+ '¡Selección preparada! Esta es una demostración: todavía no se registran reservas ni pagos reales.';
+};
+dibujar();
+</script>
+</body>
+</html>
